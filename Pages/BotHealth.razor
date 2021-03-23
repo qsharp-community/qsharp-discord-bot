@@ -1,0 +1,29 @@
+@page "/bot-health"
+@using Discord.WebSocket
+@inject DiscordSocketClient DiscordClient
+
+<h1>Bot Health</h1>
+
+<p>Logged in as: @DiscordClient.CurrentUser</p>
+
+<h2>Connected servers</h2>
+
+<ul>
+    @foreach (var server in DiscordClient.Guilds)
+    {
+        <li>@server.Name</li>
+    }
+</ul>
+
+<button class="btn btn-primary" @onclick="SendTestMessage">Send test message to connected servers</button>
+
+@code {
+    private async Task SendTestMessage()
+    {
+        var payload = $"Test message sent from {DiscordClient.CurrentUser}.";
+        foreach (var server in DiscordClient.Guilds)
+        {
+            await server.DefaultChannel.SendMessageAsync(payload);
+        }
+    }
+}

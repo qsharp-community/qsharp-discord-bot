@@ -1,0 +1,38 @@
+@page "/qsharp-env"
+@using Microsoft.Quantum.IQSharp
+@inject INugetPackages Packages
+@inject IWorkspace Workspace
+
+<h1>Q# environment</h1>
+
+<h2>Workspace status</h2>
+
+<p>
+    @Workspace.Initialization.Status
+</p>
+
+
+<h2>NuGet packages</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Package ID</th>
+            <th>Version</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var package in Packages.Items)
+        {
+            <tr>
+                <td>@package?.Id</td>
+                <td>@package?.Version</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code
+{
+}

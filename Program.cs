@@ -3,6 +3,9 @@
 // </copyright>
 
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 public class Program
 {
@@ -14,13 +17,19 @@ public class Program
         // using .env files.
         DotNetEnv.Env.TraversePath().Load();
 
-        // Start the various services making up the bot.
-        var startup = new Startup();
-
-        // Using the new startup object, actually start the bot.
-        await startup.Start();
-
-        // Await indefinitely before exiting the program.
-        await Task.Delay(-1);
+        // Build the web host, including all Discord bot services as well.
+        var host = CreateHostBuilder(args).Build();
+        // Start the Discord bot in the background.
+        host.Services.ConnectDiscordToLogging();
+        await host.Services.GetRequiredService<Bot>().Start();
+        // Finally, run the web host.
+        host.Run();
     }
+
+    public static IHostBuilder CreateHostBuilder(string[] args) =>
+        Host.CreateDefaultBuilder(args)
+            .ConfigureWebHostDefaults(webBuilder =>
+            {
+                webBuilder.UseStartup<Startup>();
+            });
 }
