@@ -1,0 +1,5 @@
+.env
+bin
+obj
+publish
+.azure
