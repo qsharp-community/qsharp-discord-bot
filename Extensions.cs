@@ -8,6 +8,13 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Quantum.QsCompiler.SyntaxTree;
+
+using QsExpression = Microsoft.Quantum.QsCompiler.SyntaxTokens.QsExpressionKind<
+    Microsoft.Quantum.QsCompiler.SyntaxTree.TypedExpression,
+    Microsoft.Quantum.QsCompiler.SyntaxTree.Identifier,
+    Microsoft.Quantum.QsCompiler.SyntaxTree.ResolvedType
+>;
 
 public static class Extensions
 {
@@ -66,5 +73,20 @@ public static class Extensions
             .GetRequiredService<ILogger<DiscordSocketClient>>()
             .Log;
         return services;
+    }
+
+    public static bool TryGetString(this QsDeclarationAttribute? attribute, string name, out string? result, string @namespace = "Microsoft.Quantum.Documentation")
+    {
+        if (attribute?.TypeId.ValueOr(null)?.Name == name &&
+            attribute.Argument.Expression is QsExpression.StringLiteral str)
+        {
+            result = str.Item1;
+            return true;
+        }
+        else
+        {
+            result = null;
+            return false;
+        }
     }
 }
