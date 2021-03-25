@@ -12,6 +12,7 @@ using Microsoft.Quantum.IQSharp;
 using Microsoft.Quantum.IQSharp.Common;
 using Microsoft.Quantum.QsCompiler.SyntaxTokens;
 using Microsoft.Quantum.QsCompiler.SyntaxTree;
+using Microsoft.Quantum.QsCompiler.Transformations.QsCodeOutput;
 using Microsoft.Quantum.Simulation.Simulators;
 
 /// <summary>
@@ -50,6 +51,8 @@ public class HelpModule : ModuleBase<SocketCommandContext>
                 return;
             }
 
+            var signature = op.Header.DeclarationSignature();
+
             string? summary = null;
             string? description = null;
             foreach (var attr in op.Header.Attributes)
@@ -67,8 +70,16 @@ public class HelpModule : ModuleBase<SocketCommandContext>
                 }
             }
 
-            var link = $"[{op.FullName}](https://docs.microsoft.com/en-us/qsharp/api/qsharp/{op.FullName.ToLowerInvariant()})";
-            await ReplyAsync($"{link}\n\n{(summary != null ? $"## Summary\n\n{summary}\n\n" : "")} {(description != null ? $"## Description\n\n{description}" : "")} ");
+            var url = $"https://docs.microsoft.com/en-us/qsharp/api/qsharp/{op.FullName.ToLowerInvariant()}";
+            await ReplyAsync(
+                embed: new EmbedBuilder()
+                    .WithTitle($"{op.FullName} API reference")
+                    .AddField("Signature", signature)
+                    .AddField("Summary", summary)
+                    .AddField("Description", description)
+                    .WithUrl(url)
+                    .Build()
+            );
         }
         finally
         {
